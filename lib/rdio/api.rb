@@ -1,13 +1,13 @@
 module Rdio
-  
+
   # ----------------------------------------------------------------------
   # Provides main API functionality by translating Ruby calls to REST
   # calls to the super class
   # ----------------------------------------------------------------------
   class Api < BaseApi
-    
-    def initialize(key=nil,secret=nil)
-      super key,secret
+
+    def initialize(clientid=nil,secret=nil)
+      super clientid,secret
     end
 
     # AccessToken[token] -> Api
@@ -20,7 +20,7 @@ module Rdio
       api.access_token = token
       return api
     end
-    
+
     # Add a friend to the current user.
     def addFriend(user)
       method = 'addFriend'
@@ -28,7 +28,7 @@ module Rdio
       args = {:user=>user}
       return_object type,method,args,true
     end
-    
+
     # Add tracks or playlists to the current user's collection.
     def addToCollection(objs)
       method = 'addToCollection'
@@ -36,7 +36,7 @@ module Rdio
       args = {:keys=>Rdio::keys(objs)}
       return_object type,method,args,true
     end
-    
+
     # Add a track to a playlist.
     def addToPlaylist(playlist,tracks)
       method = 'addToPlaylist'
@@ -44,7 +44,7 @@ module Rdio
       args = {:playlist=>playlist, :tracks=>Rdio::keys(tracks)}
       return_object type,method,args,true
     end
-    
+
     # Create a new playlist in the current user's collection.  The new
     # playlist will be returned if the creation is successful, otherwise
     # null will be returned.
@@ -56,7 +56,7 @@ module Rdio
       args[:extras] = extras if extras
       return_object type,method,args,true
     end
-    
+
     # Get information about the currently logged in user.
     def currentUser(extras=nil)
       method = 'currentUser'
@@ -65,7 +65,7 @@ module Rdio
       args[:extras] = extras if extras
       return_object type,method,args,true
     end
-    
+
     # Delete a playlist.
     def deletePlaylist(playlist)
       method = 'deletePlaylist'
@@ -73,7 +73,7 @@ module Rdio
       args = {:playlist=>playlist}
       return_object type,method,args,true
     end
-    
+
     # Find a user either by email address or by their username.  Exactly
     # one of email or vanityName must be supplied.
     def findUserByEmail(email)
@@ -82,7 +82,7 @@ module Rdio
       args = {:email=>email}
       return_object type,method,args
     end
-    
+
     # Find a user either by email address or by their username.  Exactly
     # one of email or vanityName must be supplied.
     def findUserByVanityName(name)
@@ -91,7 +91,7 @@ module Rdio
       args = {:vanityName=>name}
       return_object type,method,args
     end
-    
+
     # Fetch one or more objects from Rdio.
     def get(objs,type=nil,extras=nil)
       if not objs.is_a? Array
@@ -107,7 +107,7 @@ module Rdio
       end
       create_object type,json,true
     end
-    
+
     # Get the activity events for a user, a user's friends, or
     # everyone on Rdio.
     def getActivityStream(user,scope,last_id=nil)
@@ -118,7 +118,7 @@ module Rdio
       auth = user
       return_object type,method,args,auth
     end
-    
+
     # Return the albums by (or featuring) an artist.
     def getAlbumsForArtist(artist,featuring=nil,extras=nil,start=nil,count=nil)
       method = 'getAlbumsForArtist'
@@ -130,7 +130,7 @@ module Rdio
       args[:count] = count if count
       return_object type,method,args
     end
-    
+
     # Get the albums in the user's collection by a particular artist.
     def getAlbumsForArtistInCollection(artist,user=nil,extras=nil)
       method = 'getAlbumsForArtistInCollection'
@@ -141,7 +141,7 @@ module Rdio
       auth = !!user
       return_object type,method,args,auth
     end
-    
+
     # Get all of the albums in the user's collection.
     def getAlbumsInCollection(user=nil,start=nil,count=nil,
                               sort=nil,query=nil,extras=nil)
@@ -157,7 +157,7 @@ module Rdio
       auth = !!user
       return_object type,method,args,auth
     end
-    
+
     # Get all of the artist in a user's collection.
     def getArtistsInCollection(user=nil,start=nil,count=nil,sort=nil,
                                query=nil,extras=nil)
@@ -173,7 +173,7 @@ module Rdio
       auth = !!user
       return_object type,method,args,auth
     end
-    
+
     # Find the most popular artists or albums for a user, their friends
     # or the whole site.
     def getHeavyRotation(user=nil,type=nil,friends=nil,limit=nil,extras=nil)
@@ -192,7 +192,7 @@ module Rdio
       args[:extras] = extras if extras
       return_object cls,method,args
     end
-    
+
     # Return new albums released across a timeframe.
     def getNewReleases(time=nil,start=nil,count=nil,extras=nil)
       method = 'getNewReleases'
@@ -204,7 +204,7 @@ module Rdio
       args[:extras] = extras if extras
       return_object type,method,args
     end
-    
+
     # Return the object that the supplied Rdio short-code is a
     # representation of, or null if the short-code is invalid.
     def getObjectFromShortCode(short_code,type=nil)
@@ -213,7 +213,7 @@ module Rdio
       args = {:short_code=>short_code}
       return_object type,method,args,true
     end
-    
+
     # Return the object that the supplied Rdio url is a representation
     # of, or null if the url doesn't represent an object.
     def getObjectFromUrl(url,type=nil)
@@ -222,7 +222,7 @@ module Rdio
       args = {:url=>url}
       return_object type,method,args,true
     end
-    
+
     # Get an playback token. If you are using this for web playback you
     # must supply a domain.
     def getPlaybackToken(domain=nil)
@@ -232,7 +232,7 @@ module Rdio
       args[:domain] = domain if domain
       return_object type,method,args,true
     end
-      
+
     # Get the current user's playlists.
     def getPlaylists(extras=nil)
       method = 'getPlaylists'
@@ -241,7 +241,7 @@ module Rdio
       args[:extras] = extras if extras
       return_object type,method,args,true
     end
-    
+
     # Return the site-wide most popular items for a given type.
     def getTopCharts(type,start=nil,count=nil,extras=nil)
       method = 'getTopCharts'
@@ -259,7 +259,7 @@ module Rdio
       args = {:type=>type}
       return_object cls,method,args
     end
-    
+
     # Which tracks on the given album are in the user's collection.
     def getTracksForAlbumInCollection(album,user=nil,extras=nil)
       method = 'getTracksForAlbumInCollection'
@@ -269,7 +269,7 @@ module Rdio
       args[:extras] = extras if extras
       return_object type,method,args
     end
-    
+
     # Get all of the tracks by this artist.
     def getTracksForArtist(artist,appears_on=nil,start=nil,count=nil,extras=nil)
       method = 'getTracksForArtist'
@@ -281,7 +281,7 @@ module Rdio
       args[:extras] = extras if extras
       return_object type,method,args
     end
-    
+
     # Which tracks from the given artist are in the user's collection.
     def getTracksForArtistInCollection(artist,user=nil,extras=nil)
       method = 'getTracksForArtistInCollection'
@@ -291,7 +291,7 @@ module Rdio
       args[:extras] = extras if extras
       return_object type,method,args
     end
-    
+
     # Get all of the tracks in the user's collection.
     def getTracksInCollection(user=nil,start=nil,count=nil,sort=nil,query=nil,extras=nil)
       method = 'getTracksInCollection'
@@ -305,7 +305,7 @@ module Rdio
       args[:extras] = extras if extras
       return_object type,method,args
     end
-    
+
     # Remove a friend from the current user.
     def removeFriend(user)
       method = 'removeFriend'
@@ -313,7 +313,7 @@ module Rdio
       args = {:user=>user}
       return_object type,method,args,true
     end
-    
+
     # Remove tracks or playlists from the current user's collection.
     def removeFromCollection(objs)
       method = 'removeFromCollection'
@@ -321,7 +321,7 @@ module Rdio
       args = {:keys=>Rdio::keys(objs)}
       return_object type,method,args
     end
-    
+
     # Remove an item from a playlist by its position in the playlist.
     def removeFromPlaylist(playlist,index,count,tracks)
       method = 'removeFromPlaylist'
@@ -364,7 +364,7 @@ module Rdio
       args = {:playlist=>playlist,:name=>name,:description=>description}
       return_object type,method,args,true
     end
-    
+
     # Search for artists, albums, tracks, users or all kinds of objects.
     def search(query,types=nil,never_or=nil,extras=nil,start=nil,count=nil)
       result = search_json query,types,never_or,extras,start,count
@@ -392,7 +392,7 @@ module Rdio
       obj = search_json query,types,never_or,extras,start,count
       return JSONObj.new obj
     end
-    
+
     # Match the supplied prefix against artists, albums, tracks and
     # people in the Rdio system.  Return the first ten matches.
     def searchSuggestions(query,extras)
@@ -421,14 +421,13 @@ module Rdio
       args[:extras] = extras if extras
       args[:start] = start if start
       args[:count] = count if count
-      
       json = call method,args
       if Rdio::log_json
         Rdio::log json
       end
       return unwrap_json json
     end
-    
+
   end
 
 end

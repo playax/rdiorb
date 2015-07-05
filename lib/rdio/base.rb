@@ -53,7 +53,7 @@ module Rdio
       def decapitilize(s)
         s[0,1].downcase + s[1,s.length-1].to_s
       end
-      s = decapitilize s 
+      s = decapitilize s
       while s.match /([A-Z]+)/
         s = s.gsub /#{$1}/,'_'+ decapitilize($1)
       end
@@ -73,7 +73,7 @@ module Rdio
       end
       return arr.to_s + ',' + str.to_s
     end
-    
+
     # array -> string
     #
     # Creates a ','-separated string of the value of 'to_k' from all the
@@ -121,7 +121,7 @@ module Rdio
       end
       return s
     end
-    
+
   end
 
   class << self
@@ -141,7 +141,7 @@ module Rdio
   # ----------------------------------------------------------------------
   class ApiObj
     attr_reader :api
-    
+
     def initialize(api)
       @api = api
     end
@@ -225,7 +225,7 @@ module Rdio
       return res
     end
   end
-  
+
   # ----------------------------------------------------------------------
   # An ApiObj with a 'key'
   # ----------------------------------------------------------------------
@@ -238,7 +238,7 @@ module Rdio
     end
 
     # Compares only by key
-    def eql?(that)  
+    def eql?(that)
       self.class.equal? that.class and self.key.equal? that.key
     end
 
@@ -264,10 +264,12 @@ module Rdio
     # key and secret can be 'nil' because users can now set the
     # access_token directly
     #
-    def initialize(key=nil,secret=nil)
-      @oauth = RdioOAuth.new key,secret
-      @access_token_auth = nil
-      @access_token_no_auth = nil
+    def initialize(client_id=nil,client_secret=nil)
+      @client_id = client_id
+      @client_secret = client_secret
+      req1 = RestClient.post("https://services.rdio.com/oauth2/token",
+                    "grant_type=client_credentials&client_id=#{@client_id}&client_secret=#{@client_secret}")
+      @access_token = JSON.parse(req1)["access_token"]
     end
 
     # (string -> string) -> (string -> string)
@@ -302,6 +304,7 @@ module Rdio
       end
       new_args = {}
       new_args['method'] = method
+      new_args['access_token'] = @access_token
       args.each do |k,v|
         new_args[k] = v.to_k.to_s
       end
@@ -309,16 +312,8 @@ module Rdio
       if Rdio::log_posts
         Rdio::log "Post to url=#{url} method=#{method} args=#{args}"
       end
-      #
-      # For backwards compatibility the response may have a 'body'
-      # attribute or a tuple could be returned.  Handle both cases.
-      #
-      resp,data = access_token(requires_auth).post url,new_args
-      begin
-        return resp.body
-      rescue
-      end
-      return data
+
+      RestClient.post('https://services.rdio.com/api/1/', new_args)
     end
 
     def return_object(type,method,args,requires_auth=false)
@@ -363,7 +358,7 @@ module Rdio
       end
       raise Exception.new status
     end
-    
+
     def _create_object(type,json_str,keys_to_objects=false)
       if type == true
         return true
@@ -372,7 +367,7 @@ module Rdio
         return false
       end
       result = unwrap_json(json_str)
-      if type == Boolean or type == String or 
+      if type == Boolean or type == String or
           type == Fixnum or type == Float
         return false if not result
         return Rdio::to_o result
@@ -389,7 +384,7 @@ module Rdio
       #
       if result.is_a? Array
         res = result.map {|x| fill_obj type,x}
-      else 
+      else
         res = fill_obj type,result
       end
       return res

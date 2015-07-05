@@ -34,9 +34,9 @@ module Rdio
     # the consumer and token can be accessed
     attr_accessor :consumer, :token
 
-    def initialize(consumer, token=nil)
-      @consumer = consumer
-      @token = token
+    def initialize(client_id, client_secret)
+      @client_id = client_id
+      @client_secret = client_secret
     end
 
     def begin_authentication(callback_url)
@@ -67,19 +67,19 @@ module Rdio
       # put the method in the dict
       params['method'] = method
       # call to the server and parse the response
-      return JSON.load(signed_post('http://api.rdio.com/1/', params))
+      return JSON.load(signed_post('https://services.rdio.com/api/1/', params))
     end
 
     private
 
     def signed_post(url, params)
-      auth = OM::om(@consumer, url, params, @token)
-      url = URI.parse(url)
-      http = Net::HTTP.new(url.host, url.port)
-      req = Net::HTTP::Post.new(url.path, {'Authorization' => auth})
-      req.set_form_data(params)
-      res = http.request(req)
-      return res.body
+      unless @access_token
+        req1 = RestClient.post("https://services.rdio.com/oauth2/token",
+                      "grant_type=client_credentials&client_id=#{@client_id}&client_secret=#{@client_secret}")
+        @access_token = JSON.parse(req1)["access_token"]
+      end
+
+      RestClient.post(url, params.merge!(access_token: @access_token))
     end
 
   end
